@@ -10,8 +10,8 @@ editor_options:
 ```{r setup}
 library(xlsx)
 library(tidyverse)
-
-workbook_with_model <- "amh_model_inputs_all_interventions_third_revision_attempt.xlsx"
+# Updated:
+workbook_with_model <- "amh_model_inputs_all_interventions_global_final.xlsx"#"amh_model_inputs_all_interventions_third_revision_attempt.xlsx"
 
 param_all <- read.xlsx(workbook_with_model, 
                        sheetName = "Parameters", 

@@ -37,7 +37,7 @@ inc_raw <- read.csv("Raw model input files/GBD 2019 incidence data.csv")
 # Global Burden of Disease Study 2019 (GBD 2019) Results.
 # Seattle, United States: Institute for Health Metrics and Evaluation (IHME), 2020.
 # Available from http://ghdx.healthdata.org/gbd-results-tool.
-suicide_raw <- read.csv("TooLarge/GBD 2019 suicide data.csv")
+suicide_raw <- read.csv("Raw model input files/GBD 2019 suicide data.csv")
 
 # read in background morbidity data
 # source Global Burden of Disease Collaborative Network.
@@ -48,7 +48,7 @@ bg_morbidity_raw <- read.csv("Raw model input files/GBD 2019 background morbidit
 
 # read in UNPD population data
 # source United Nations Population Division, “World Population Prospects,” 2019, https://population.un.org/wpp/Download/Standard/CSV/.
-unpd_raw <- read.csv("Raw model input files/TooLarge/WPP2019_PopulationBySingleAgeSex_1950-2019.csv") ## FAILS UNTIL DOWNLOAD FROM:
+unpd_raw <- read.csv("TooLarge/WPP2019_PopulationBySingleAgeSex_1950-2019.csv") ## FAILS UNTIL DOWNLOAD FROM:
 # "https://population.un.org/wpp2019/Download/Files/1_Indicators%20(Standard)/CSV_FILES/WPP2019_PopulationBySingleAgeSex_1950-2019.csv"
 
 # read in life table data
@@ -318,23 +318,44 @@ world_bank$location_name <- revalue(world_bank$location_name,
     "CuraÃ§ao" = "Curaçao",
     "SÃ£o TomÃ© and Principe" = "São Tomé and Príncipe",
     "Vietnam" = "Viet Nam"))
+world_bank <- world_bank %>% dplyr::mutate(location_name = dplyr::case_when(location_name == "São Tomé and Principe" ~ "São Tomé and Príncipe",## New
+                                                                            TRUE ~ location_name))
 
-who <- rename(who_raw, c("ï..Country" = "location_name"))
-who$location_name <- revalue(who$location_name,
-  c("Iran, Islamic Republic of" = "Iran (Islamic Republic of)",
-    "Tanzania, United Republic of" = "United Republic of Tanzania",
-    "Antigua And Barbuda" = "Antigua and Barbuda",
-    "Bahamas" = "Bahamas, The",
-    "Cape Verde" = "Cabo Verde",
-    "Democratic Peoples Republic of Korea" = "North Korea",
-    "Korea, Republic of" = "South Korea",
-    "Lao People's Democratic Republic" = "Lao PDR",
-    "Macedonia, the former Yugoslav Republic of" = "North Macedonia",
-    "Micronesia, Federated States of" = "Micronesia",
-    "Moldova, Republic of" = "Moldova",
-    "Saint Kitts and Nevis" = "St. Kitts and Nevis",
-    "Saint Vincent and the Grenadines" = "St. Vincent and the Grenadines",
-    "Swaziland" = "Eswatini"))
+who <- rename(who_raw, c("Country" = "location_name"#"ï..Country" = "location_name"
+                         ))
+# REPLACED
+# who$location_name <- revalue(who$location_name,
+#   c("Iran, Islamic Republic of" = "Iran (Islamic Republic of)",
+#     "Tanzania, United Republic of" = "United Republic of Tanzania",
+#     "Antigua And Barbuda" = "Antigua and Barbuda",
+#     "Bahamas" = "Bahamas, The",
+#     "Cape Verde" = "Cabo Verde",
+#     "Democratic Peoples Republic of Korea" = "North Korea",
+#     "Korea, Republic of" = "South Korea",
+#     "Lao People's Democratic Republic" = "Lao PDR",
+#     "Macedonia, the former Yugoslav Republic of" = "North Macedonia",
+#     "Micronesia, Federated States of" = "Micronesia",
+#     "Moldova, Republic of" = "Moldova",
+#     "Saint Kitts and Nevis" = "St. Kitts and Nevis",
+#     "Saint Vincent and the Grenadines" = "St. Vincent and the Grenadines",
+#     "Swaziland" = "Eswatini"))
+## Replaced with:
+who <- who %>% dplyr::mutate(location_name = dplyr::case_when(location_name == "Iran, Islamic Republic of" ~ "Iran (Islamic Republic of)",
+                                                              location_name == "Tanzania, United Republic of" ~ "United Republic of Tanzania",
+                                                              location_name == "Antigua And Barbuda" ~ "Antigua and Barbuda",
+                                                              location_name == "Bahamas" ~ "Bahamas, The",
+                                                              location_name == "Cape Verde" ~ "Cabo Verde",
+                                                              location_name == "Democratic Peoples Republic of Korea" ~ "North Korea",
+                                                              location_name == "Korea, Republic of" ~ "South Korea",
+                                                              location_name == "Lao People's Democratic Republic" ~ "Lao PDR",
+                                                              location_name == "Macedonia, the former Yugoslav Republic of" ~ "North Macedonia",
+                                                              location_name == "Micronesia, Federated States of" ~ "Micronesia",
+                                                              location_name == "Moldova, Republic of" ~ "Moldova",
+                                                              location_name == "Saint Kitts and Nevis" ~ "St. Kitts and Nevis",
+                                                              location_name == "Saint Vincent and the Grenadines" ~ "St. Vincent and the Grenadines",
+                                                              
+                                                              location_name== "Swaziland" ~ "Eswatini",
+                                                              TRUE ~ location_name))
 
 world_bank_append <- data.frame("location_name" = c("Cameroon", "Cook Islands", "Niue"),
                                 "X2019" =         c("LM",       "UM",           "UM"))
@@ -374,6 +395,8 @@ who_append <- as.data.frame(rbind(c("American Samoa",            "WPRO"),
                                   c("West Bank and Gaza",        "EMRO")))
 names(who_append) <- c("location_name", "Region.Name")
 who <- rbind.fill(who, who_append)
+## New
+who<- dplyr::arrange(who, location_name)
 
 world_bank$location_name[!(world_bank$location_name %in% who$location_name)]
 who$location_name[!(who$location_name %in% world_bank$location_name)] 
@@ -391,7 +414,10 @@ wb_and_who$X2019 <- revalue(wb_and_who$X2019, c("H" = "High",
 wb_and_who <- rename(wb_and_who, c("location_name" = "country", 
                                    "X2019" = "wb_income_level",
                                    "Region.Name" = "who_region_name"))
-
+## New trialed content, deprecated
+# munged_who_df <- who %>% dplyr::mutate(location_name = Country %>% purrr::map_chr(location_name, ~ c(.x,.y) %>% purrr::discard(is.na))) %>%
+#   dplyr::arrange(location_name)
+##
 wb_and_who_tot <- merge(world_bank[, c("location_name", "X2019")],
                     who[, c("location_name", "Region.Name")])
 ```
@@ -404,7 +430,9 @@ bg_morbidity <- bg_morbidity[, !(names(bg_morbidity) %in% c("metric", "year"))]
 
 bg_morbidity$age_group_start <- sapply(bg_morbidity$age, 
                                        function (x) as.numeric(substr(x, start = 1, stop = 2)))
-bg_morbidity <- rename(bg_morbidity, c("ï..measure" = "measure"))
+# REMOVED
+# bg_morbidity <- rename(bg_morbidity, c("ï..measure" = "measure")
+#                        ) # THROWS WARNING
 bg_morbidity$measure <- gsub(" \\(..*", "", bg_morbidity$measure)
 
 # only including disability, not death, so drop self-harm; only need to subtract
@@ -822,7 +850,7 @@ exp_w_by_edu$edu_level <- rep_len(c("exp_w_edu_lt_basic", "exp_w_edu_basic", "ex
 exp_w_by_edu <- reshape2::dcast(exp_w_by_edu, country + sex ~ edu_level, value.var = "exp_w_2019_USD")
 
 ## get probability of level of education by age for each country
-pr_edu <- rename(pr_edu_raw, c("ï..ref_area.label" = "country",
+pr_edu <- rename(pr_edu_raw, c("ref_area.label" = "country",#"ï..ref_area.label" = "country", #REPLACED
                            "sex.label" = "sex",
                            "classif1.label" = "age_bands",
                            "classif2.label" = "edu_level",
@@ -855,8 +883,7 @@ china_proxy <- as.character(wb_and_who_tot$location_name[wb_and_who_tot$X2019 ==
 philippines_proxy <- as.character(wb_and_who_tot$location_name[wb_and_who_tot$X2019 == "LM" & wb_and_who_tot$Region.Name == "WPRO"])
 
 pr_edu_um_wpro <- subset(pr_edu, grepl("Aggregate", pr_edu$edu_level) & 
-                           country %in% china_proxy) ### THROWS WARNING
-
+                           country %in% china_proxy) 
 ### PICK UP HERE - NEED TO REPLACE DDPLYR
 pr_edu_um_wpro <- ddply(pr_edu_um_wpro, .(sex, age_bands, edu_level), summarise,
                         pr_edu_level_raw = mean(pr_edu_level, na.rm = TRUE))
@@ -926,7 +953,7 @@ pr_edu_lt_15$pr_edu_inter <- 0
 pr_edu <- rbind(pr_edu, pr_edu_lt_15)
 
 ## get probability of employment by education level in each country
-pr_emp_edu <- rename(pr_emp_edu_raw, c("ï..ref_area.label" = "country",
+pr_emp_edu <- rename(pr_emp_edu_raw, c("ref_area.label" = "country",#"ï..ref_area.label" = "country",
                                    "sex.label" = "sex",
                                    "classif1.label" = "age_bands",
                                    "classif2.label" = "edu_level",

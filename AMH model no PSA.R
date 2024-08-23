@@ -27,7 +27,8 @@ life_table_w_suicide <- read_in_data("life_table_w_suicide")
 pr_edu_and_emp_edu   <- read_in_data("pr_edu_and_emp_edu")
 starting_data        <- read_in_data("starting_data")
 wb_and_who           <- read_in_data("wb_and_who_countries")
-intervention_dsa     <- read.csv("Model output files/best_worst_all_20220107.csv")
+# REMOVED AS CANT BE FOUND
+#intervention_dsa     <- read.csv("Model output files/best_worst_all_20220107.csv")
 
 # select starting population----------------------------------------------------
 starting_pop_data <- #starting_data
