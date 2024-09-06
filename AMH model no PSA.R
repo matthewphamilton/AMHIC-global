@@ -2,6 +2,9 @@
 # Rachel Stelmach
 # February 10, 2022
 
+# Temporary hacky fix attempt - needs to be moved:
+markov_cycle <- 12
+
 ptm <- proc.time()
 
 # set up------------------------------------------------------------------------
@@ -258,8 +261,8 @@ for (j in 1:length(input_files)) {
         invest = strat_invest,
         parameters = param,
         cycles = 80 * 12,
-        cost = cost,
-        effect = benefit,
+        cost = NULL,#cost,
+        effect = NULL,# benefit,
         init = start_dist
       )
       

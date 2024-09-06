@@ -7,11 +7,20 @@ editor_options:
   chunk_output_type: console
 ---
 
+```{r}
+path_stub_1L_chr <- ""
+```
+
+```{r echo=FALSE, eval=FALSE}
+path_stub_1L_chr <- "Model definition files/"
+```
+
 ```{r setup}
 library(xlsx)
 library(tidyverse)
+getwd()
 # Updated:
-workbook_with_model <- "amh_model_inputs_all_interventions_global_final.xlsx"#"amh_model_inputs_all_interventions_third_revision_attempt.xlsx"
+workbook_with_model <- paste0(path_stub_1L_chr,"amh_model_inputs_all_interventions_global_final.xlsx")#"amh_model_inputs_all_interventions_third_revision_attempt.xlsx"
 
 param_all <- read.xlsx(workbook_with_model, 
                        sheetName = "Parameters", 

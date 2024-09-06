@@ -209,7 +209,11 @@ unpd$Sex <- gsub("Pop", "", unpd$Sex)
 ```
 
 ```{r get_mortality}
-life_table <- data.table(life_table_raw)
+life_table <- data.table(life_table_raw %>%
+                           dplyr::mutate(AgeGrp = dplyr::case_when(AgeGrp == "4-Jan" ~ "1-4",
+                                                                   AgeGrp == "9-May" ~ "5-9",
+                                                                   AgeGrp == "14-Oct" ~ "10-14",
+                                                                   TRUE ~ AgeGrp)))
 
 # get life_table countries to match
 
