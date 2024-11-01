@@ -261,8 +261,8 @@ for (j in 1:length(input_files)) {
         invest = strat_invest,
         parameters = param,
         cycles = 80 * 12,
-        cost = NULL,#cost,
-        effect = NULL,# benefit,
+        cost = cost,
+        effect = benefit,
         init = start_dist
       )
       
@@ -279,17 +279,15 @@ for (j in 1:length(input_files)) {
     
     model_counts <- do.call(rbind, model_counts)
     
-    model_counts_tot <- aggregate(count ~ .strategy_names + state_names + 
-                                    markov_cycle,
+    model_counts_tot <- aggregate(count ~ .strategy_names + state_names + model_time,#markov_cycle,
                                   data = model_counts, FUN = sum)
     
-    model_counts_tot$year <- ceiling(model_counts_tot$markov_cycle / 12)
+    model_counts_tot$year <- ceiling(model_counts_tot$model_time / 12) #markov_cycle 
     
     # get the cost and health state values in each run of the model
     for (i in 1:length(model_values)) {
       model_values[[i]]$country_sex_year <- names(model_values[i])
     }
-    
     model_values <- do.call(rbind, model_values)
     
     if (effects_var[m] == "dalys") {
@@ -317,15 +315,29 @@ for (j in 1:length(input_files)) {
                      format(Sys.time(), "_%Y%m%d_%H%M"), 
                      ".csv"))
     } else if (effects_var[m] == "dalys") {
+      # Write dirs first
+      new_dirs_chr <- c(paste0("Model output files/", cases[k], " case"),
+                    paste0("Model output files/", cases[k], " case/Raw values/"))
+      if(!dir.exists(new_dirs_chr[1])){
+        dir.create(new_dirs_chr[1])
+      }
+      if(!dir.exists(new_dirs_chr[2])){
+        dir.create(new_dirs_chr[2])
+      }
+      # ready4::write_new_dirs("Model output files/Base case",  consent_1L_chr = "Y")
+      # ready4::write_new_dirs("Model output files/Base case/Raw values",  consent_1L_chr = "Y")
+     
+      # ready4::write_new_dirs("Model output files/Base/Raw values")
     write.csv(model_values_dalys, row.names = FALSE,
-              paste0("Model output files/", cases[k], " case/Raw values/", 
-                     cases[k], " case raw model dalys ", 
+              paste0("Model output files/", cases[k], " case/Raw values/",
+                     cases[k],
+                     " case raw model dalys ",
                      gsub("amh_model_inputs_|.xlsx", "",
                           input_files[j]),
-                     format(Sys.time(), "_%Y%m%d_%H%M"), 
-                     ".csv"))
+                     format(Sys.time(), "_%Y%m%d_%H%M"),
+                     ".csv")
+              )
     }
-    
     
   } # this bracket closes the loop generating the different outcome variables
   

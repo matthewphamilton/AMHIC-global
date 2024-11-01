@@ -194,10 +194,13 @@ for (i in 1:length(input_files)) {
   # need single quotes around the character values
   hypercube$sex <- paste0("'", hypercube$sex, "'")
   hypercube$country <- paste0("'", hypercube$country, "'")
-  
-  #write.csv(hypercube, 
-  #          paste0("Model output files/Hypercube samples/hc_",
-  #                 intervention,
-  #                 ".csv"),
-  #          row.names = FALSE)
+  new_dir_1L_chr <- "Model output files/Hypercube samples"
+  if(!dir.exists(new_dir_1L_chr)){
+    dir.create(new_dir_1L_chr)
+  }
+  write.csv(hypercube,
+           paste0("Model output files/Hypercube samples/hc_",
+                  intervention,
+                  ".csv"),
+           row.names = FALSE)
 }
