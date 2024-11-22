@@ -16,6 +16,7 @@ wb_and_who           <- read_in_data("wb_and_who_countries")
 input_files <- list.files("Model definition files/")
 input_files <- grep("amh_", input_files, value = TRUE)
 input_files <- grep("standard", input_files, value = TRUE)
+# Next line can be commented out if you do not wish to restrict output to "all" option
 input_files <- grep("all_interventions", input_files, value = TRUE)
 
 for (i in 1:length(input_files)) {

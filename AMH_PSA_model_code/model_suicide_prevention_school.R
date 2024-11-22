@@ -9,10 +9,10 @@ library(tidyverse)
 library(stringr)
 library(beepr)
 library(mc2d)
-
+# path_start_1L_chr <- "/share/storage/AMHIC/"
+path_start_1L_chr <- "./"
 # read in cleaned datasets (from AMH data processing file)----------------------
-file_path_clean_data <- 
-  "/share/storage/AMHIC/Model definition files/AUTO GENERATED cleaned data frames/"
+file_path_clean_data <- paste0(path_start_1L_chr,"Model definition files/AUTO GENERATED cleaned data frames/")
 read_in_data <- function (file_name) {
   read.csv(paste0(file_path_clean_data, file_name, ".csv"))
 }
@@ -28,7 +28,7 @@ wb_and_who           <- read_in_data("wb_and_who_countries")
 
 # select interventions of interest----------------------------------------------
 #### generate model
-input_files <- list.files("/share/storage/AMHIC/Model definition files/")
+input_files <- list.files(paste0(path_start_1L_chr,"Model definition files/"))
 input_files <- grep("amh_", input_files, value = TRUE)
 input_files <- grep("standard", input_files, value = TRUE)
 input_files <- grep("suicide_prevention_school", input_files, value = TRUE)
@@ -39,11 +39,12 @@ effects_var <- c("benefits", "dalys") # options: benefits, dalys
 # run model---------------------------------------------------------------------
 
 file_path_model_define <-
-  "/share/storage/AMHIC/Model definition files/AUTO GENERATED cleaned model inputs/"
+  paste0(path_start_1L_chr,"Model definition files/AUTO GENERATED cleaned model inputs/")
 
 for (j in 1:length(input_files)) {
-  excel_sheet_with_data <- paste0("/share/storage/AMHIC/Model definition files/", 
-                                  input_files[j])
+  excel_sheet_with_data <- paste0(paste0(path_start_1L_chr,
+                                         "Model definition files/"), 
+                                         input_files[j])
   intervention <- gsub("amh_model_inputs_|_standard.xlsx", "", input_files[j])
   
   # generate a parameter input called "param" based on the model inputs files
@@ -52,7 +53,7 @@ for (j in 1:length(input_files)) {
                             sheetName = "Parameters")
   
   hypercube_sample <- 
-    read.csv(paste0("/share/storage/AMHIC/Model output files/Hypercube samples/hc_",
+    read.csv(paste0(paste0(path_start_1L_chr,"Model output files/Hypercube samples/hc_"),
                     intervention, ".csv"))
   hypercube_sample_row <- floor(runif(1, min = 0, 
                                       max = nrow(hypercube_sample))) + 1
@@ -268,7 +269,7 @@ for (j in 1:length(input_files)) {
   
   ## getting the results out
   write.csv(res_summary, row.names = FALSE,
-            paste0("/share/storage/AMHIC/Model output files/PSA output/", 
+            paste0(paste0(path_start_1L_chr,"Model output files/PSA output/"), 
                    intervention, "/", intervention, "_",
                    str_pad(sample(1:999999999, 1), width = 9, pad = "0"), 
                    ".csv"))
